@@ -1,0 +1,51 @@
+name: Validate infrastructure
+
+# Lint/validate the platform layer on every PR that touches infrastructure/.
+# No cloud credentials, no apply — formatting + static validation only.
+on:
+  pull_request:
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/infra-validate.yaml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.10.5'
+
+      - name: Install Terragrunt
+        run: |
+          TG_VERSION=0.67.16
+          curl -sSL -o /usr/local/bin/terragrunt \
+            "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64"
+          chmod +x /usr/local/bin/terragrunt
+          terragrunt --version
+
+      # Formatting checks run first, before any `terraform init` populates
+      # .terraform/ module caches (those contain vendored *.hcl / *.pkr.hcl
+      # example files that would break the recursive hclfmt scan).
+      - name: terraform fmt (modules)
+        run: terraform fmt -check -recursive infrastructure/_modules
+
+      - name: terragrunt hcl fmt (check)
+        run: terragrunt hclfmt --terragrunt-check --terragrunt-working-dir infrastructure
+
+      # Static validation last: `terraform init` here downloads modules into
+      # infrastructure/_modules/*/.terraform, which must not exist during the
+      # formatting steps above.
+      - name: terraform validate (each module)
+        run: |
+          set -e
+          for dir in infrastructure/_modules/*/; do
+            echo "::group::validate $dir"
+            terraform -chdir="$dir" init -backend=false -input=false
+            terraform -chdir="$dir" validate
+            echo "::endgroup::"
+          done
