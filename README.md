@@ -18,6 +18,16 @@ You can get more details at [Wiki Pages](https://github.com/FudanSELab/train-tic
 ## Quick Start
 We provide k8s deployment to quickly deploy our application:  [Using Kubernetes](#Using-Kubernetes).
 
+To run the whole system on a single machine without Kubernetes, use the
+Docker Compose deployment in
+[`deployment/docker-compose-manifests/local/`](deployment/docker-compose-manifests/local/):
+
+```bash
+cd deployment/docker-compose-manifests/local
+./up.sh
+# UI: http://localhost:8080  (fdse_microservice / 111111)
+```
+
 ### Using Kubernetes
 Here is the steps to deploy the Train Ticket onto any existing Kubernetes cluster.
 

@@ -32,7 +32,11 @@ python3 hack/gen-local-compose.py
 ## Requirements
 
 - Docker with the compose plugin
-- ~14 GB free RAM (each Java service runs with `-Xmx200m`, capped at 700 MB)
+- ~16 GB RAM: at steady state each Java service sits around 340 MB RSS
+  (`-Xmx200m` heap, 700 MB container cap), ~15 GB total for the full stack.
+  On a 16 GB machine add a few GB of swap
+  (`fallocate -l 8G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile`)
+  so the boot spike doesn't trigger the OOM killer.
 - ~15 GB free disk for images
 
 ## Usage
