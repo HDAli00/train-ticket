@@ -1,0 +1,1158 @@
+# Local docker-compose deployment of train-ticket 1.0 (all services).
+# GENERATED from deployment/kubernetes-manifests/quickstart-k8s/yamls/deploy.yaml.sample
+# by hack/gen-local-compose.py -- edit that script, not this file.
+# Usage: see deployment/docker-compose-manifests/local/README.md (use up.sh, not a bare 'up').
+name: train-ticket
+services:
+  ts-mysql:
+    image: mysql:5.7
+    command:
+    - --max_connections=1000
+    - --character-set-server=utf8mb4
+    - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: Ts_123456
+      MYSQL_DATABASE: ts
+      MYSQL_USER: ts
+      MYSQL_PASSWORD: Ts_123456
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    mem_limit: 1g
+    restart: unless-stopped
+    networks:
+    - trainticket
+  nacos:
+    image: nacos/nacos-server:v2.1.0
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: 'false'
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+      JVM_XMN: 256m
+    ports:
+    - 8848:8848
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -sf http://127.0.0.1:8848/nacos/v1/console/health/readiness
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    mem_limit: 1g
+    restart: unless-stopped
+    networks:
+    - trainticket
+  rabbitmq:
+    image: rabbitmq:3.10
+    healthcheck:
+      test:
+      - CMD
+      - rabbitmq-diagnostics
+      - -q
+      - ping
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
+    mem_limit: 512m
+    restart: unless-stopped
+    networks:
+    - trainticket
+  ts-admin-basic-info-service:
+    image: codewisdom/ts-admin-basic-info-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18767" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-admin-order-service:
+    image: codewisdom/ts-admin-order-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16112" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-admin-route-service:
+    image: codewisdom/ts-admin-route-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16113" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-admin-travel-service:
+    image: codewisdom/ts-admin-travel-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16114" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-admin-user-service:
+    image: codewisdom/ts-admin-user-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16115" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-assurance-service:
+    image: codewisdom/ts-assurance-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18888" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      ASSURANCE_MYSQL_HOST: ts-mysql
+      ASSURANCE_MYSQL_PORT: '3306'
+      ASSURANCE_MYSQL_DATABASE: ts
+      ASSURANCE_MYSQL_USER: ts
+      ASSURANCE_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-auth-service:
+    image: codewisdom/ts-auth-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12340" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      AUTH_MYSQL_HOST: ts-mysql
+      AUTH_MYSQL_PORT: '3306'
+      AUTH_MYSQL_DATABASE: ts
+      AUTH_MYSQL_USER: ts
+      AUTH_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-avatar-service:
+    image: codewisdom/ts-avatar-service:0.2.0
+    restart: unless-stopped
+    mem_limit: 512m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/17001" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-basic-service:
+    image: codewisdom/ts-basic-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/15680" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-cancel-service:
+    image: codewisdom/ts-cancel-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18885" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-config-service:
+    image: codewisdom/ts-config-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/15679" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      CONFIG_MYSQL_HOST: ts-mysql
+      CONFIG_MYSQL_PORT: '3306'
+      CONFIG_MYSQL_DATABASE: ts
+      CONFIG_MYSQL_USER: ts
+      CONFIG_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-consign-price-service:
+    image: codewisdom/ts-consign-price-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16110" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      CONSIGN_PRICE_MYSQL_HOST: ts-mysql
+      CONSIGN_PRICE_MYSQL_PORT: '3306'
+      CONSIGN_PRICE_MYSQL_DATABASE: ts
+      CONSIGN_PRICE_MYSQL_USER: ts
+      CONSIGN_PRICE_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-consign-service:
+    image: codewisdom/ts-consign-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16111" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      CONSIGN_MYSQL_HOST: ts-mysql
+      CONSIGN_MYSQL_PORT: '3306'
+      CONSIGN_MYSQL_DATABASE: ts
+      CONSIGN_MYSQL_USER: ts
+      CONSIGN_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-contacts-service:
+    image: codewisdom/ts-contacts-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12347" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      CONTACTS_MYSQL_HOST: ts-mysql
+      CONTACTS_MYSQL_PORT: '3306'
+      CONTACTS_MYSQL_DATABASE: ts
+      CONTACTS_MYSQL_USER: ts
+      CONTACTS_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-delivery-service:
+    image: codewisdom/ts-delivery-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18808" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      rabbitmq_host: rabbitmq
+      DELIVERY_MYSQL_HOST: ts-mysql
+      DELIVERY_MYSQL_PORT: '3306'
+      DELIVERY_MYSQL_DATABASE: ts
+      DELIVERY_MYSQL_USER: ts
+      DELIVERY_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-execute-service:
+    image: codewisdom/ts-execute-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12386" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-food-service:
+    image: codewisdom/ts-food-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18856" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      rabbitmq_host: rabbitmq
+      FOOD_MYSQL_HOST: ts-mysql
+      FOOD_MYSQL_PORT: '3306'
+      FOOD_MYSQL_DATABASE: ts
+      FOOD_MYSQL_USER: ts
+      FOOD_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-food-delivery-service:
+    image: codewisdom/ts-food-delivery-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18957" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      FOOD_DELIVERY_MYSQL_HOST: ts-mysql
+      FOOD_DELIVERY_MYSQL_PORT: '3306'
+      FOOD_DELIVERY_MYSQL_DATABASE: ts
+      FOOD_DELIVERY_MYSQL_USER: ts
+      FOOD_DELIVERY_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-gateway-service:
+    image: codewisdom/ts-gateway-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18888" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+    ports:
+    - 18888:18888
+  ts-inside-payment-service:
+    image: codewisdom/ts-inside-payment-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18673" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      INSIDE_PAYMENT_MYSQL_HOST: ts-mysql
+      INSIDE_PAYMENT_MYSQL_PORT: '3306'
+      INSIDE_PAYMENT_MYSQL_DATABASE: ts
+      INSIDE_PAYMENT_MYSQL_USER: ts
+      INSIDE_PAYMENT_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-news-service:
+    image: codewisdom/ts-news-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12862" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-notification-service:
+    image: codewisdom/ts-notification-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/17853" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      rabbitmq_host: rabbitmq
+      NOTIFICATION_MYSQL_HOST: ts-mysql
+      NOTIFICATION_MYSQL_PORT: '3306'
+      NOTIFICATION_MYSQL_DATABASE: ts
+      NOTIFICATION_MYSQL_USER: ts
+      NOTIFICATION_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-order-other-service:
+    image: codewisdom/ts-order-other-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12032" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      rabbitmq_host: rabbitmq
+      ORDER_OTHER_MYSQL_HOST: ts-mysql
+      ORDER_OTHER_MYSQL_PORT: '3306'
+      ORDER_OTHER_MYSQL_DATABASE: ts
+      ORDER_OTHER_MYSQL_USER: ts
+      ORDER_OTHER_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-order-service:
+    image: codewisdom/ts-order-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12031" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      rabbitmq_host: rabbitmq
+      ORDER_MYSQL_HOST: ts-mysql
+      ORDER_MYSQL_PORT: '3306'
+      ORDER_MYSQL_DATABASE: ts
+      ORDER_MYSQL_USER: ts
+      ORDER_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-payment-service:
+    image: codewisdom/ts-payment-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/19001" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      PAYMENT_MYSQL_HOST: ts-mysql
+      PAYMENT_MYSQL_PORT: '3306'
+      PAYMENT_MYSQL_DATABASE: ts
+      PAYMENT_MYSQL_USER: ts
+      PAYMENT_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-preserve-other-service:
+    image: codewisdom/ts-preserve-other-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14569" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      rabbitmq_host: rabbitmq
+    depends_on:
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+  ts-preserve-service:
+    image: codewisdom/ts-preserve-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14568" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      rabbitmq_host: rabbitmq
+    depends_on:
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+  ts-price-service:
+    image: codewisdom/ts-price-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16579" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      PRICE_MYSQL_HOST: ts-mysql
+      PRICE_MYSQL_PORT: '3306'
+      PRICE_MYSQL_DATABASE: ts
+      PRICE_MYSQL_USER: ts
+      PRICE_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-rebook-service:
+    image: codewisdom/ts-rebook-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18886" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      rabbitmq_host: rabbitmq
+    depends_on:
+      nacos:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+  ts-route-plan-service:
+    image: codewisdom/ts-route-plan-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14578" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-route-service:
+    image: codewisdom/ts-route-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/11178" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      ROUTE_MYSQL_HOST: ts-mysql
+      ROUTE_MYSQL_PORT: '3306'
+      ROUTE_MYSQL_DATABASE: ts
+      ROUTE_MYSQL_USER: ts
+      ROUTE_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-seat-service:
+    image: codewisdom/ts-seat-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18898" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-security-service:
+    image: codewisdom/ts-security-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/11188" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      SECURITY_MYSQL_HOST: ts-mysql
+      SECURITY_MYSQL_PORT: '3306'
+      SECURITY_MYSQL_DATABASE: ts
+      SECURITY_MYSQL_USER: ts
+      SECURITY_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-station-food-service:
+    image: codewisdom/ts-station-food-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18855" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      STATION_FOOD_MYSQL_HOST: ts-mysql
+      STATION_FOOD_MYSQL_PORT: '3306'
+      STATION_FOOD_MYSQL_DATABASE: ts
+      STATION_FOOD_MYSQL_USER: ts
+      STATION_FOOD_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-station-service:
+    image: codewisdom/ts-station-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12345" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      STATION_MYSQL_HOST: ts-mysql
+      STATION_MYSQL_PORT: '3306'
+      STATION_MYSQL_DATABASE: ts
+      STATION_MYSQL_USER: ts
+      STATION_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-ticket-office-service:
+    image: codewisdom/ts-ticket-office-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16108" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      TICKET_OFFICE_MYSQL_HOST: ts-mysql
+      TICKET_OFFICE_MYSQL_PORT: '3306'
+      TICKET_OFFICE_MYSQL_DATABASE: ts
+      TICKET_OFFICE_MYSQL_USER: ts
+      TICKET_OFFICE_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-train-food-service:
+    image: codewisdom/ts-train-food-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/19999" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      TRAIN_FOOD_MYSQL_HOST: ts-mysql
+      TRAIN_FOOD_MYSQL_PORT: '3306'
+      TRAIN_FOOD_MYSQL_DATABASE: ts
+      TRAIN_FOOD_MYSQL_USER: ts
+      TRAIN_FOOD_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-train-service:
+    image: codewisdom/ts-train-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14567" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      TRAIN_MYSQL_HOST: ts-mysql
+      TRAIN_MYSQL_PORT: '3306'
+      TRAIN_MYSQL_DATABASE: ts
+      TRAIN_MYSQL_USER: ts
+      TRAIN_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-travel-plan-service:
+    image: codewisdom/ts-travel-plan-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14322" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-travel-service:
+    image: codewisdom/ts-travel-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12346" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      TRAVEL_MYSQL_HOST: ts-mysql
+      TRAVEL_MYSQL_PORT: '3306'
+      TRAVEL_MYSQL_DATABASE: ts
+      TRAVEL_MYSQL_USER: ts
+      TRAVEL_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-travel2-service:
+    image: codewisdom/ts-travel2-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16346" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      TRAVEL2_MYSQL_HOST: ts-mysql
+      TRAVEL2_MYSQL_PORT: '3306'
+      TRAVEL2_MYSQL_DATABASE: ts
+      TRAVEL2_MYSQL_USER: ts
+      TRAVEL2_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-user-service:
+    image: codewisdom/ts-user-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12342" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      USER_MYSQL_HOST: ts-mysql
+      USER_MYSQL_PORT: '3306'
+      USER_MYSQL_DATABASE: ts
+      USER_MYSQL_USER: ts
+      USER_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-verification-code-service:
+    image: codewisdom/ts-verification-code-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/15678" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+    depends_on:
+      nacos:
+        condition: service_healthy
+  ts-voucher-service:
+    image: codewisdom/ts-voucher-service:1.0.0
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16101" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      VOUCHER_MYSQL_HOST: ts-mysql
+      VOUCHER_MYSQL_PORT: '3306'
+      VOUCHER_MYSQL_DATABASE: ts
+      VOUCHER_MYSQL_USER: ts
+      VOUCHER_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-wait-order-service:
+    image: codewisdom/ts-wait-order-service:1.0.1
+    restart: unless-stopped
+    mem_limit: 700m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/17525" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    environment:
+      NACOS_ADDRS: nacos:8848
+      WAIT_ORDER_MYSQL_HOST: ts-mysql
+      WAIT_ORDER_MYSQL_PORT: '3306'
+      WAIT_ORDER_MYSQL_DATABASE: ts
+      WAIT_ORDER_MYSQL_USER: ts
+      WAIT_ORDER_MYSQL_PASSWORD: Ts_123456
+    depends_on:
+      nacos:
+        condition: service_healthy
+      ts-mysql:
+        condition: service_healthy
+  ts-ui-dashboard:
+    image: codewisdom/ts-ui-dashboard:1.0.1
+    restart: unless-stopped
+    mem_limit: 256m
+    networks:
+    - trainticket
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - bash -c "exec 3<>/dev/tcp/127.0.0.1/8080" || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    ports:
+    - 8080:8080
+    depends_on:
+      ts-gateway-service:
+        condition: service_started
+networks:
+  trainticket:
+    driver: bridge
