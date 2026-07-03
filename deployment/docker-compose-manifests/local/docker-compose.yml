@@ -73,7 +73,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18767" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18767; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18767"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -92,7 +92,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16112" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16112; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16112"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -111,7 +111,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16113" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16113; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16113"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -130,7 +130,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16114" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16114; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16114"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -149,7 +149,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16115" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16115; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16115"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -168,7 +168,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18888" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18888; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18888"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -194,7 +194,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12340" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12340; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12340"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -220,7 +220,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/17001" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 17001; else bash -c "exec 3<>/dev/tcp/127.0.0.1/17001"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -239,7 +239,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/15680" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 15680; else bash -c "exec 3<>/dev/tcp/127.0.0.1/15680"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -258,7 +258,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18885" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18885; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18885"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -277,7 +277,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/15679" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 15679; else bash -c "exec 3<>/dev/tcp/127.0.0.1/15679"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -303,7 +303,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16110" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16110; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16110"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -329,7 +329,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16111" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16111; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16111"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -355,7 +355,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12347" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12347; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12347"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -381,7 +381,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18808" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18808; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18808"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -410,7 +410,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12386" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12386; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12386"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -429,7 +429,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18856" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18856; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18856"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -458,7 +458,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18957" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18957; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18957"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -484,7 +484,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18888" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18888; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18888"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -505,7 +505,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18673" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18673; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18673"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -531,7 +531,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12862" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12862; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12862"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -550,7 +550,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/17853" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 17853; else bash -c "exec 3<>/dev/tcp/127.0.0.1/17853"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -579,7 +579,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12032" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12032; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12032"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -608,7 +608,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12031" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12031; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12031"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -637,7 +637,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/19001" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 19001; else bash -c "exec 3<>/dev/tcp/127.0.0.1/19001"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -663,7 +663,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14569" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 14569; else bash -c "exec 3<>/dev/tcp/127.0.0.1/14569"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -685,7 +685,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14568" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 14568; else bash -c "exec 3<>/dev/tcp/127.0.0.1/14568"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -707,7 +707,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16579" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16579; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16579"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -733,7 +733,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18886" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18886; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18886"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -755,7 +755,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14578" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 14578; else bash -c "exec 3<>/dev/tcp/127.0.0.1/14578"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -774,7 +774,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/11178" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 11178; else bash -c "exec 3<>/dev/tcp/127.0.0.1/11178"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -800,7 +800,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18898" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18898; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18898"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -819,7 +819,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/11188" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 11188; else bash -c "exec 3<>/dev/tcp/127.0.0.1/11188"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -845,7 +845,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/18855" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 18855; else bash -c "exec 3<>/dev/tcp/127.0.0.1/18855"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -871,7 +871,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12345" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12345; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12345"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -897,7 +897,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16108" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16108; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16108"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -923,7 +923,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/19999" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 19999; else bash -c "exec 3<>/dev/tcp/127.0.0.1/19999"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -949,7 +949,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14567" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 14567; else bash -c "exec 3<>/dev/tcp/127.0.0.1/14567"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -975,7 +975,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/14322" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 14322; else bash -c "exec 3<>/dev/tcp/127.0.0.1/14322"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -994,7 +994,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12346" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12346; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12346"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -1020,7 +1020,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16346" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16346; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16346"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -1046,7 +1046,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/12342" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 12342; else bash -c "exec 3<>/dev/tcp/127.0.0.1/12342"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -1072,7 +1072,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/15678" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 15678; else bash -c "exec 3<>/dev/tcp/127.0.0.1/15678"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -1091,7 +1091,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/16101" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 16101; else bash -c "exec 3<>/dev/tcp/127.0.0.1/16101"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -1117,7 +1117,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/17525" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 17525; else bash -c "exec 3<>/dev/tcp/127.0.0.1/17525"; fi
       interval: 15s
       timeout: 5s
       retries: 40
@@ -1143,7 +1143,7 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - bash -c "exec 3<>/dev/tcp/127.0.0.1/8080" || exit 1
+      - if command -v nc >/dev/null; then nc -z 127.0.0.1 8080; else bash -c "exec 3<>/dev/tcp/127.0.0.1/8080"; fi
       interval: 15s
       timeout: 5s
       retries: 40

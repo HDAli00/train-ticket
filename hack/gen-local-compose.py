@@ -101,7 +101,11 @@ for d in docs:
         'mem_limit': '700m',
         'networks': ['trainticket'],
         'healthcheck': {
-            'test': ['CMD-SHELL', f'bash -c "exec 3<>/dev/tcp/127.0.0.1/{port}" || exit 1'],
+            # TCP port probe that works on both debian-based images (bash,
+            # no nc) and busybox-based ones like ts-news-service (nc, no bash)
+            'test': ['CMD-SHELL',
+                     f'if command -v nc >/dev/null; then nc -z 127.0.0.1 {port}; '
+                     f'else bash -c "exec 3<>/dev/tcp/127.0.0.1/{port}"; fi'],
             'interval': '15s', 'timeout': '5s', 'retries': 40, 'start_period': '60s',
         },
     }
