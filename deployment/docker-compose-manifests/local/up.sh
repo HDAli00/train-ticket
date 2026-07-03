@@ -45,6 +45,22 @@ wait_healthy() {
   done
 }
 
+require_healthy() {
+  # Like wait_healthy, but aborts instead of continuing. Used for the
+  # infrastructure gate: if nacos/mysql/rabbitmq are not healthy, every app
+  # service's depends_on fails and the waves end up stuck in Created state.
+  local timeout=$1; shift
+  wait_healthy "$timeout" "$@"
+  for s in "$@"; do
+    state=$($COMPOSE ps --format '{{.Health}}' "$s" 2>/dev/null || true)
+    if [[ "$state" != "healthy" ]]; then
+      echo "ERROR: $s did not become healthy within ${timeout}s." >&2
+      echo "Check 'docker compose logs $s', then re-run ./up.sh — it is idempotent." >&2
+      exit 1
+    fi
+  done
+}
+
 case "${1:-up}" in
   down)
     $COMPOSE down -v
@@ -57,7 +73,10 @@ case "${1:-up}" in
   up)
     echo "==> [1/6] Infrastructure: mysql, nacos, rabbitmq"
     $COMPOSE up -d ts-mysql nacos rabbitmq
-    wait_healthy 300 ts-mysql nacos rabbitmq
+    # Hard gate with a generous timeout: on a loaded machine (or a restart
+    # where app containers come back alongside it) nacos alone can take
+    # several minutes to serve its readiness endpoint.
+    require_healthy 600 ts-mysql nacos rabbitmq
     echo "==> [2/6] Wave 1: core data services"
     $COMPOSE up -d $WAVE1
     wait_healthy 600 $WAVE1
