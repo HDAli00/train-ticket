@@ -14,8 +14,12 @@ docs = [d for d in yaml.safe_load_all(open(SAMPLE)) if d and d.get('kind') == 'D
 services = {
     'ts-mysql': {
         'image': 'mysql:5.7',
-        'command': ['--max_connections=1000', '--character-set-server=utf8mb4',
-                    '--collation-server=utf8mb4_unicode_ci'],
+        # utf8 (3-byte), not utf8mb4: the services create MyISAM tables with
+        # varchar(255) primary keys, and 255*4 bytes would exceed MyISAM's
+        # 1000-byte index key limit, failing DDL (and the data-seeding
+        # CommandLineRunners) at startup.
+        'command': ['--max_connections=1000', '--character-set-server=utf8',
+                    '--collation-server=utf8_general_ci'],
         'environment': {
             'MYSQL_ROOT_PASSWORD': MYSQL_PASS,
             'MYSQL_DATABASE': MYSQL_DB,
